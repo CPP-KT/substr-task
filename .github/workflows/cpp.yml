@@ -8,11 +8,13 @@ jobs:
     name: Testing substr
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: dependencies
       run: |
         sudo apt install binutils g++ cmake
         sudo apt install haskell-stack netbase
+    - name: setup tests
+      run: stack setup && stack build
     - name: build
       run: bash build.sh
     - name: run debug tests
