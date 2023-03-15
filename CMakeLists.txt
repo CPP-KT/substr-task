@@ -3,6 +3,8 @@ project(substr_task)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-sign-compare -pedantic-errors")
-
 add_executable(solution solution.cpp)
+
+if (NOT MSVC)
+    target_compile_options(solution PRIVATE -Werror -Wall -Wextra -Wshadow=compatible-local -Wno-sign-compare -pedantic)
+endif()
