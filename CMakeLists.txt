@@ -6,9 +6,15 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(solution solution.cpp)
 
 if (MSVC)
-    target_compile_options(solution PRIVATE /WX /W4 /permissive-)
+    target_compile_options(solution PRIVATE /W4 /permissive-)
+    if (TREAT_WARNINGS_AS_ERRORS)
+        target_compile_options(solution PRIVATE /WX)
+    endif()
 else()
-    target_compile_options(solution PRIVATE -Werror -Wall -Wextra -pedantic -Wno-sign-compare)
+    target_compile_options(solution PRIVATE -Wall -Wextra -pedantic -Wno-sign-compare)
+    if (TREAT_WARNINGS_AS_ERRORS)
+        target_compile_options(solution PRIVATE -Werror)
+    endif()
 endif()
 
 # Compiler specific warnings
