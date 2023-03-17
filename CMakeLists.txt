@@ -5,6 +5,19 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(solution solution.cpp)
 
-if (NOT MSVC)
-    target_compile_options(solution PRIVATE -Werror -Wall -Wextra -Wshadow=compatible-local -Wno-sign-compare -pedantic)
+if (MSVC)
+    target_compile_options(solution PRIVATE /WX /W4 /permissive-)
+else()
+    target_compile_options(solution PRIVATE -Werror -Wall -Wextra -pedantic -Wno-sign-compare)
+endif()
+
+# Compiler specific warnings
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(solution PRIVATE -Wshadow=compatible-local)
+    target_compile_options(solution PRIVATE -Wduplicated-branches)
+    target_compile_options(solution PRIVATE -Wduplicated-cond)
+    target_compile_options(solution PRIVATE -Wnull-dereference)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(solution PRIVATE -Wshadow-uncaptured-local)
+    target_compile_options(solution PRIVATE -Wloop-analysis)
 endif()
