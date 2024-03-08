@@ -30,7 +30,10 @@ jobs:
           sudo apt install haskell-stack netbase
       - uses: actions/checkout@v3
       - name: setup tests
-        run: stack setup && stack build
+        run: |
+          pushd test
+          stack build
+          popd
       - name: build
         run: ${{ matrix.compilerSetter }} bash build.sh
       - name: run debug tests

@@ -3,7 +3,7 @@ project(substr_task)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(solution solution.cpp)
+add_executable(solution src/main.cpp)
 
 if (MSVC)
     target_compile_options(solution PRIVATE /W4 /permissive-)
