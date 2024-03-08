@@ -44,7 +44,7 @@ data TestResolution = TestResolution { testRunId     :: String
 
 formatTestName :: String
                -> String
-formatTestName testId = "Test - " ++ show testId ++ ".data"
+formatTestName testId = "Test - " ++ testId ++ ".data"
 
 runSolution :: FilePath   -- Solution executable path
             -> [String]   -- List of argv
