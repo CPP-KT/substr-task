@@ -6,7 +6,8 @@
 # Cmake
 CMakeCache.txt
 CMakeFiles/
-cmake-build*
+build*/
+cmake-build*/
 cmake_install.cmake
 Makefile
 
@@ -15,5 +16,4 @@ Makefile
 
 # Haskell
 .stack-work/*
-_build*
 Test - *
