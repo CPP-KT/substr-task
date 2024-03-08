@@ -84,7 +84,15 @@ jobs:
           ninja: true
           cmake: true
 
-      - name: Setup Haskell
+      - name: Setup Haskell Stack using apt-get
+        if: ${{ contains(matrix.toolchain.os, 'ubuntu') }}
+        run: |
+          apt-get update -qq
+          apt-get install -y haskell-stack
+          chown $(id -u):$(id -g) ~
+
+      - name: Setup Haskell Stack using haskell-actions/setup
+        if: ${{ !contains(matrix.toolchain.os, 'ubuntu') }}
         uses: haskell-actions/setup@v2
         with:
           enable-stack: true
