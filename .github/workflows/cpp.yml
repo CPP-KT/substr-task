@@ -28,7 +28,6 @@ jobs:
     name: "Test (${{ matrix.toolchain.name }}, ${{ matrix.build_type }})"
 
     strategy:
-      fail-fast: false
       matrix:
         toolchain:
           - { name: Linux/GCC,   os: ubuntu-22.04, compiler: gcc-13 }
