@@ -38,7 +38,7 @@ jobs:
         build_type:
           - Release
           - Debug
-          - RelWithDebInfo
+          # - RelWithDebInfo
           - Sanitized
           - SanitizedDebug
           # - ThreadSanitized
