@@ -63,6 +63,8 @@ jobs:
         format('ghcr.io/cpp-kt/ubuntu:{0}', matrix.toolchain.compiler) ||
         null
         }}
+      options:
+        --security-opt seccomp=unconfined
 
     defaults:
       run:
