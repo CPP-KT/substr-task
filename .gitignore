@@ -15,5 +15,6 @@ Makefile
 .DS_Store
 
 # Haskell
-.stack-work/*
+.stack-work/
 Test - *
+*.cabal
