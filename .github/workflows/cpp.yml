@@ -64,13 +64,20 @@ jobs:
         null
         }}
       options:
-        --security-opt seccomp=unconfined
+        --privileged --security-opt seccomp=unconfined
 
     defaults:
       run:
         shell: bash
 
     steps:
+      # Workaround to https://github.com/actions/runner-images/issues/9491
+      - name: Fix kernel mmap rnd bits
+        if: ${{ contains(matrix.toolchain.os, 'ubuntu') }}
+        run: |
+          sysctl vm.mmap_rnd_bits=28
+          sysctl vm.mmap_rnd_compat_bits=8
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -132,6 +139,7 @@ jobs:
             echo -e '\e[0;33mWARNING: Running a newer version of the tests than you have pushed.\e[0m'
           fi
           ci-extra/test.sh ${{ matrix.build_type }}
+        timeout-minutes: 1
 
       - name: Run tests with valgrind
         if: ${{ matrix.build_type == 'RelWithDebInfo' }}
