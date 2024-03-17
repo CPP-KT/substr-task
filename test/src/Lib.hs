@@ -9,7 +9,7 @@ module Lib
 
 import Data.Semigroup ((<>))
 import Data.List ( isInfixOf )
-import System.IO ( Handle, hGetLine )
+import System.IO ( Handle, hGetContents, hGetLine, hPutStrLn, stderr )
 import System.Exit ( ExitCode(..) )
 import System.Process
     ( runInteractiveProcess, waitForProcess, ProcessHandle )
@@ -77,7 +77,9 @@ getStudentAnswer solution (Test testInfo testId) = do
       return $ Right ("No output in the test " ++ show testId ++ " expected", exitCode)
   where
     getInternal args = do
-      (inp, out, _, pid) <- runSolution solution args
+      (_, out, err, pid) <- runSolution solution args
+      errStr <- hGetContents err
+      hPutStrLn stderr $ errStr
       !ans      <- tryIOError $ hGetLine out
       !exitCode <- waitForProcess pid
       return (ans, exitCode)
