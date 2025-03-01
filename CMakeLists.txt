@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 project(substr)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 add_executable(substr src/main.cpp)
 
@@ -38,24 +38,18 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(substr PRIVATE -Wno-self-assign-overloaded)
 endif()
 
-option(USE_SANITIZERS "Enable to build with undefined, address and leak sanitizers" OFF)
+option(USE_SANITIZERS "Enable to build with undefined and address sanitizers" OFF)
 if(USE_SANITIZERS)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         message(STATUS "Enabling ASAN")
         target_compile_options(substr PUBLIC /fsanitize=address)
-        target_link_options(substr PUBLIC /fsanitize=address)
+        target_compile_definitions(substr PUBLIC _DISABLE_STRING_ANNOTATION=1 _DISABLE_VECTOR_ANNOTATION=1)
     else()
         message(STATUS "Enabling USAN and ASAN")
         target_compile_options(substr PUBLIC -fsanitize=undefined,address)
         target_link_options(substr PUBLIC -fsanitize=undefined,address)
 
         target_compile_options(substr PUBLIC -fno-sanitize-recover=all -fno-optimize-sibling-calls -fno-omit-frame-pointer)
-
-        if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-            message(STATUS "Enabling LSAN")
-            target_compile_options(substr PUBLIC -fsanitize=leak)
-            target_link_options(substr PUBLIC -fsanitize=leak)
-        endif()
     endif()
 endif()
 
@@ -64,16 +58,4 @@ if(USE_THREAD_SANITIZER)
     message(STATUS "Enabling TSAN")
     target_compile_options(substr PUBLIC -fsanitize=thread -fno-sanitize-recover=all)
     target_link_options(substr PUBLIC -fsanitize=thread)
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    message(STATUS "Enabling libc++")
-    # These are intentionally set for all targets
-    add_compile_options(-stdlib=libc++)
-    add_link_options(-stdlib=libc++)
-endif()
-
-if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    message(STATUS "Enabling _GLIBCXX_DEBUG")
-    target_compile_options(substr PUBLIC -D_GLIBCXX_DEBUG)
 endif()

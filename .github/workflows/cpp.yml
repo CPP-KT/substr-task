@@ -18,9 +18,9 @@ jobs:
           popd
       - name: Run clang-format style check
         # TODO use clang-format from a container
-        uses: jidicula/clang-format-action@v4.11.0
+        uses: jidicula/clang-format-action@v4.13.0
         with:
-          clang-format-version: '17'
+          clang-format-version: '18'
           check-path: '.'
 
   test:
@@ -28,11 +28,13 @@ jobs:
     name: "Test (${{ matrix.toolchain.name }}, ${{ matrix.build_type }})"
 
     strategy:
+      fail-fast: false
       matrix:
         toolchain:
-          - { name: Linux/GCC,   os: ubuntu-22.04, compiler: gcc-13 }
-          - { name: Linux/Clang, os: ubuntu-22.04, compiler: clang-18 }
-          - { name: macOS,       os: macos-14,     compiler: appleclang-18 }
+          - { name: Linux/GCC,   os: ubuntu-24.04, compiler: gcc-14 }
+          - { name: Linux/Clang, os: ubuntu-24.04, compiler: clang-19 }
+          - { name: macOS,       os: macos-13,     compiler: appleclang-19 }
+          - { name: macOS M1,    os: macos-14,     compiler: appleclang-19 }
           - { name: Windows,     os: windows-2022, compiler: msvc-2022 }
         build_type:
           - Release
@@ -63,20 +65,13 @@ jobs:
         null
         }}
       options:
-        --privileged --security-opt seccomp=unconfined
+        --security-opt seccomp=unconfined
 
     defaults:
       run:
         shell: bash
 
     steps:
-      # Workaround to https://github.com/actions/runner-images/issues/9491
-      - name: Fix kernel mmap rnd bits
-        if: ${{ contains(matrix.toolchain.os, 'ubuntu') }}
-        run: |
-          sysctl vm.mmap_rnd_bits=28
-          sysctl vm.mmap_rnd_compat_bits=8
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
