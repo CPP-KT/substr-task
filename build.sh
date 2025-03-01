@@ -3,7 +3,7 @@
 BUILD_TYPE=${1:-SanitizedDebug}
 
 # Configure CMake
-cmake -S . -B cmake-build-"$BUILD_TYPE" --preset "$BUILD_TYPE"
+cmake -S . -B build-"$BUILD_TYPE" --preset "$BUILD_TYPE"
 
 # Build
-cmake --build cmake-build-"$BUILD_TYPE" -j
+cmake --build build-"$BUILD_TYPE" -j
