@@ -52,7 +52,7 @@ $ ./substr bar.txt 'abaz'
     - `-DUSE_SANITIZERS` &mdash; включить санитайзеры (см., как используется этот параметр в `CMakeLists.txt`).
 2. Типичные конфигурации компиляции вынесены в `CMakePresets.json`, поэтому команду можно упростить с использованием `--preset`:
     ```bash
-    $ cmake -S . -B build-debug --preset Debug
+    $ cmake -S . -B build-debug --preset SanitizedDebug
     ```
 3. Теперь, используя сгенерированные конфигурации для билд-системы, можно запустить процесс сборки:
     ```bash
