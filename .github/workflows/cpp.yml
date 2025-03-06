@@ -52,6 +52,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Update tests
+        run: |
+          chown $(id -u):$(id -g) .
+          git config --global user.name "John Doe"
+          git config --global user.email johndoe@example.com
+          source ci-extra/set-upstream.sh
+          git remote add upstream "https://github.com/$UPSTREAM_REPO.git"
+          git fetch upstream master
+          if git merge-base --is-ancestor upstream/master @; then
+            echo 'Tests are already up-to-date.'
+            echo 'TESTS_UPDATED=0' >> $GITHUB_ENV
+          else
+            echo 'Updating tests...'
+            git rebase upstream/master
+            echo 'Tests updated.'
+            echo 'TESTS_UPDATED=1' >> $GITHUB_ENV
+          fi
+
       - name: Build CMake project
         run: |
           ci-extra/build.sh ${{ matrix.build_type }}
@@ -64,6 +82,9 @@ jobs:
 
       - name: Run tests
         run: |
+          if [[ $TESTS_UPDATED -eq 1 ]]; then
+            echo -e '\e[0;33mWARNING: Running a newer version of the tests than you have pushed.\e[0m'
+          fi
           ci-extra/test.sh ${{ matrix.build_type }}
         timeout-minutes: 1
 
