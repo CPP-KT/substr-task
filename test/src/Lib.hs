@@ -38,7 +38,7 @@ data Test = Test { testInfo :: TestData
                  , testName :: String
                  } deriving (Show)
 
-data TestResolution = TestResolution { testRunId     :: String
+data TestResolution = TestResolution { test          :: Test
                                      , testRunResult :: Either String ()
                                      } deriving (Show)
 
@@ -106,7 +106,7 @@ runParTest solution test = do
   return resolutionIo
 
   where
-    asResolution = TestResolution (testName test)
+    asResolution = TestResolution test
 
     makeResolution studentResultIo ourAnswerIo = do studentResult <- studentResultIo
                                                     ourAnswer <- ourAnswerIo

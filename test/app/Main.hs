@@ -1,25 +1,34 @@
+{-# LANGUAGE BlockArguments #-}
+
 module Main where
 
 import Lib
     ( TestResolution(TestResolution),
-      Test(Test),
+      Test(Test, testInfo, testName),
       TestData(RegularTest, GenerateEnoentTest, GenerateReadErrTest,
                GenerateBadArgsTest),
       runParTests )
 import System.Environment ( getArgs )
+import System.Exit ( ExitCode(..), exitWith )
+import System.IO ( hPutStrLn, stderr )
 import Control.Monad ( forM, forM_, replicateM )
 import Control.Monad.Random ( Rand, RandomGen, evalRand, getRandom, getRandomR, mkStdGen )
 import Control.Exception ( throwIO, Exception )
 
-data TestFailedException = TestFailedException
-  { failedTestName  :: String
-  , failedTestCause :: String
-  }
-
-instance Show TestFailedException where
-  show (TestFailedException name cause) = "Test \"" ++ name ++ "\" failed:\n" ++ cause
-
-instance Exception TestFailedException
+printTestFailure :: Test -> String -> IO ()
+printTestFailure test cause = do
+  putErrLine $ "Test \"" ++ (testName test) ++ "\" failed:"
+  case (testInfo test) of
+    RegularTest testData testQuery -> do
+      putErrLine $ "File data: \"" ++ (truncateStr 50 testData) ++ "\""
+      putErrLine $ "Query string: \"" ++ (truncateStr 50 testQuery) ++ "\""
+    _ -> return ()
+  putErrLine cause
+  where
+    putErrLine = hPutStrLn stderr
+    truncateStr maxLength str
+      | length str > maxLength = take maxLength str ++ "..."
+      | otherwise              = str
 
 loadBibleDataset :: IO [Test]
 loadBibleDataset = do
@@ -79,5 +88,7 @@ main = do
     results <- runParTests solution tests
     forM_ results checkResolution
   where
-    checkResolution (TestResolution id (Left err)) = throwIO $ TestFailedException id err
-    checkResolution (TestResolution id _) = putStrLn $ "Test \"" ++ id ++ "\" -- OK"
+    checkResolution (TestResolution test (Left err)) = do
+      printTestFailure test err
+      exitWith (ExitFailure 1)
+    checkResolution (TestResolution test _) = putStrLn $ "Test \"" ++ (testName test) ++ "\" -- OK"
