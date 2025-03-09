@@ -79,7 +79,7 @@ getStudentAnswer solution (Test testInfo testId) = do
     getInternal args = do
       (_, out, err, pid) <- runSolution solution args
       errStr <- hGetContents err
-      hPutStrLn stderr $ errStr
+      unless (null errStr) $ hPutStrLn stderr errStr
       !ans      <- tryIOError $ hGetLine out
       !exitCode <- waitForProcess pid
       return (ans, exitCode)
