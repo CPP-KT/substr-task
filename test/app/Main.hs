@@ -20,20 +20,6 @@ instance Show TestFailedException where
 
 instance Exception TestFailedException
 
-simpleEq = Test (RegularTest "aaa" "aaa") "data equals query"
-
-simpleYes = Test (RegularTest "aaa" "a") "simple char search - positive"
-
-simpleNo = Test (RegularTest "aaa" "b") "simple char search - negative"
-
-checkPrefixMove = Test (RegularTest "ababar" "abar") "naive prefix automato test"
-
-simpleEnoent = Test GenerateEnoentTest "simple enoent run"
-
-simpleReadErr = Test GenerateReadErrTest "simple read err test"
-
-simpleManyArgs = Test GenerateBadArgsTest "simple many args test"
-
 loadBibleDataset :: IO [Test]
 loadBibleDataset = do
   bible <- readFile "assets/kjvbible.txt"
@@ -45,13 +31,14 @@ loadBibleDataset = do
 main :: IO ()
 main = do
   bibleDataset <- loadBibleDataset
-  let tests = [ simpleEq
-              , simpleYes
-              , checkPrefixMove
-              , simpleNo
-              , simpleEnoent
-              , simpleReadErr
-              , simpleManyArgs
+  let tests = [ Test (RegularTest "aaa" "aaa") "data equals query"
+              , Test (RegularTest "aaa" "a") "simple char search - positive"
+              , Test (RegularTest "aaa" "b") "simple char search - negative"
+              , Test (RegularTest "ababar" "abar") "fake prefix match 1"
+              , Test (RegularTest "aaabaaa" "aaaa") "fake prefix match 2"
+              , Test GenerateEnoentTest "simple enoent run"
+              , Test GenerateReadErrTest "simple read err test"
+              , Test GenerateBadArgsTest "simple many args test"
               ]
             ++ bibleDataset
   args <- getArgs
