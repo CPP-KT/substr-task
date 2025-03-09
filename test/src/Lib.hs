@@ -26,8 +26,8 @@ instance Show RunPreparationFailed where
 
 instance Exception RunPreparationFailed
 
-data TestData = RegularTest { testData  :: FilePath   --- File data to test on
-                            , testStr   :: String     --- String to look occurences for
+data TestData = RegularTest { testData  :: String     --- String to search in
+                            , testQuery :: String     --- String to search for
                             }
               | GenerateEnoentTest
               | GenerateReadErrTest

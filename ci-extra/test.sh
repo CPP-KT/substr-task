@@ -23,6 +23,8 @@ if [[ $BUILD_TYPE == 'Debug' && -n $(which gdb) && $(uname -s) != MINGW* ]]; the
     -ex 'handle SIGCHLD nostop pass' \
     -ex 'set style enabled on' \
     -ex 'set print frame-arguments all' \
+    -ex 'set print inferior-events off' \
+    -ex 'set print thread-events off' \
     -ex 'run' \
     -ex 'thread apply all bt -frame-info source-and-location -full' \
     --args stack run "$SUBSTR_EXE"

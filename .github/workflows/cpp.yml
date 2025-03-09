@@ -86,7 +86,9 @@ jobs:
             echo -e '\e[0;33mWARNING: Running a newer version of the tests than you have pushed.\e[0m'
           fi
           ci-extra/test.sh ${{ matrix.build_type }}
-        timeout-minutes: 1
+        env:
+          LC_ALL: C.UTF-8
+        timeout-minutes: 3
 
       - name: Run tests with valgrind
         if: ${{ matrix.build_type == 'RelWithDebInfo' }}

@@ -7,7 +7,8 @@ import Lib
                GenerateBadArgsTest),
       runParTests )
 import System.Environment ( getArgs )
-import Control.Monad ( forM_ )
+import Control.Monad ( forM, forM_, replicateM )
+import Control.Monad.Random ( Rand, RandomGen, evalRand, getRandom, getRandomR, mkStdGen )
 import Control.Exception ( throwIO, Exception )
 
 data TestFailedException = TestFailedException
@@ -28,6 +29,34 @@ loadBibleDataset = do
          , Test (RegularTest (bible ++ "foobarbaz") "foobarbaz") "Bible test 3"
          ]
 
+data RandomGen g => RandomStringParams g = RSP { maxLength  :: Int
+                                               , randomChar :: Rand g Char
+                                               }
+
+genRandomString :: RandomGen g => RandomStringParams g -> Rand g String
+genRandomString (RSP maxLength randomChar) = do
+  len <- getRandomR (1, maxLength)
+  replicateM len randomChar
+
+genRandomTest :: RandomGen g => RandomStringParams g -> RandomStringParams g -> String -> Rand g Test
+genRandomTest dataParams queryParams testName = do
+  testData <- genRandomString dataParams
+  testQuery <- genRandomString queryParams
+  return $ Test (RegularTest testData testQuery) testName
+
+genRandomTests :: RandomGen g => Rand g [Test]
+genRandomTests = do
+  simpleTestData <- let simpleChar = getRandomR ('a', 'c')
+                    in genRandomTests' 2000 "simple random test" (RSP 20 simpleChar) (RSP 8 simpleChar)
+  binaryTestData <- let anyChar = getRandomR ('\0', '\255')
+                        nonZeroChar = getRandomR ('\1', '\255')
+                    in genRandomTests' 2000 "binary random test" (RSP 10 anyChar) (RSP 4 nonZeroChar)
+  return $ simpleTestData ++ binaryTestData
+  where
+    genRandomTests' :: RandomGen g => Int -> String -> RandomStringParams g -> RandomStringParams g -> Rand g [Test]
+    genRandomTests' n testNamePrefix dataParams queryParams =
+      forM [1..n] $ \i -> genRandomTest dataParams queryParams (testNamePrefix ++ " " ++ show i)
+
 main :: IO ()
 main = do
   bibleDataset <- loadBibleDataset
@@ -41,6 +70,7 @@ main = do
               , Test GenerateBadArgsTest "simple many args test"
               ]
             ++ bibleDataset
+            ++ evalRand genRandomTests (mkStdGen 1337)
   args <- getArgs
   if length args /= 1 then do
     putStrLn "Path to student solution expected as the only one argument"
